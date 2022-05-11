@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useEffect, useState } from 'react';
 import ErrorMessage from './ErrorMessage';
 import {
     FormControl,
@@ -22,8 +22,16 @@ const RecipeSubmitForm = () => {
   const [recipeInstructions, setRecipeInstructions] = useState('')
   const [isVegan, setIsVegan] = useState(false)
   const [isError, setError] = useState('none')
+  const [user, setUser] = useState('null')
 
-
+  useEffect(()=> {
+    const loggedUserJSON = window.localStorage.getItem('loggedCookbookUser')    
+    if (loggedUserJSON) {      
+      const user = JSON.parse(loggedUserJSON)      
+      setUser(user)      
+      recipeServices.setToken(user.token)    
+    }
+  }, [])
 
   const handleNameChange = (e) => {
     const name = e.target.value
@@ -44,7 +52,7 @@ const RecipeSubmitForm = () => {
     setIsVegan(!isVegan) 
   }
 
-  const postRecipe = (name, ingredients, instructions, isVegan) => {
+  const postRecipe = (name, ingredients, instructions, isVegan, user) => {
     if(!name || !ingredients || !instructions) {
       setError('')
       setTimeout(() => setError('none'), 5000)
